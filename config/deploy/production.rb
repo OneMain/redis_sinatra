@@ -1,0 +1,1 @@
+server '10.21.20.124', user: 'xmo', roles: %w{web}

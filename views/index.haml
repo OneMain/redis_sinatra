@@ -1,0 +1,41 @@
+- creative_select = @creatice_select
+%a{:href =>'/'}首页
+%p
+%form{ :action => '/redis_move/create/'+creative_select, :method => 'POST'}
+  %input{ :name => 'key',:placeholder  => '请输入添加的广告位'}
+  %input{ :name => 'value',:placeholder  => '请输入添加的推广计划'}
+  %button{:type => 'submit'}添加
+
+%table
+  %tr
+    - if creative_select == "LOCATION_CREATIVES"
+      %td 城市
+    - else
+      %td 广告位
+    %td 推广计划
+  - @hash.inject({}) do | key,value |
+    %tr
+      %td
+        %input{ :name => 'key',:value => value[0],:disabled => 'true',:id => 'before_key',:size => '50px'}
+      %td
+        %input{ :name => 'value',:value => value[1],:id => "input_value_#{value[0]}",:size => '80px'}
+      %td
+        %form{:action => "/redis_move/delete/"+value[0]+"/"+creative_select, :method => "post",:style =>'display:inline'}
+          %div{:style => 'margin-top:10px;padding:0'}
+            %input{:name => "_method", :type => "hidden", :value => "delete"}
+            %button{ :type => "submit"} 删除
+      %td{:id => "#{value[0]}"}
+        %form{:action => '/redis_move/update/'+value[0]+"/"+creative_select, :method => "post",:style => 'display:inline',:name =>"update_form"}
+          %div{:style => 'margin-top:10px;padding:0'}
+            %input{ :name => "_method", :type => "hidden", :value => "put"}
+            %input{ :name => "value", :type => "hidden",:id => "hidden_input_#{value[0]}"}
+            %input{ :type => "submit",:onclick => 'save_value(this)',:value => '修改',:id => 'submit'}
+
+:javascript
+  function save_value(button)
+  {
+    var td_node = button.parentNode.parentNode.parentNode.attributes["id"];
+    var td_id_value = td_node.value;
+    var input_value = document.getElementById("input_value_"+td_id_value).value;
+    document.getElementById("hidden_input_"+td_id_value).value = input_value;
+  }
